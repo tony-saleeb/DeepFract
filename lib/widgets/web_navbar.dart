@@ -108,7 +108,7 @@ class WebNavbar extends StatelessWidget {
               // Navigation items
               _buildNavItem(context, 'Home', true),
               const SizedBox(width: 32),
-              _buildNavItem(context, 'Theme', false),
+              _buildNavItem(context, 'Help', false),
               const SizedBox(width: 32),
               _buildNavItem(context, 'About', false),
 
