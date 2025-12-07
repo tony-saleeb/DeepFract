@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../utils/file_size_extension.dart';
+import '../core/constants/app_durations.dart';
+import '../core/errors/app_exceptions.dart' as errors;
 
-/// Service for handling image compression through AI-powered backend
+/// Service for handling image compression through AI-powered backend.
 ///
 /// Backend Compression Flow:
 /// 1. User selects image from gallery/camera
@@ -12,11 +14,12 @@ import '../utils/file_size_extension.dart';
 /// 5. Compressed image is returned to client
 /// 6. User can download/share the compressed image
 class CompressionService {
-  // TODO: Backend Integration - Replace with actual API endpoint
-  // ignore: unused_field
-  static const String _apiBaseUrl = 'YOUR_BACKEND_API_URL';
-  // ignore: unused_field
-  static const String _compressEndpoint = '/api/compress';
+  /// Backend API base URL.
+  /// TODO: Backend Integration - Replace with actual API endpoint
+  static const String apiBaseUrl = 'YOUR_BACKEND_API_URL';
+
+  /// Compression endpoint path.
+  static const String compressEndpoint = '/api/compress';
 
   /// Compresses an image using AI-powered fractal compression
   ///
@@ -87,7 +90,7 @@ class CompressionService {
       */
 
       // Placeholder: Simulate API call with delay
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(AppDurations.compressionSimulation);
 
       // For now, return a mock result
       final originalSize = await imageFile.length();
@@ -108,22 +111,15 @@ class CompressionService {
     }
   }
 
-  /// Calculates the compression ratio as a percentage
+  /// Calculates the compression ratio as a percentage.
   double calculateCompressionRatio(int originalSize, int compressedSize) {
     if (originalSize == 0) return 0.0;
     return ((originalSize - compressedSize) / originalSize) * 100;
   }
 
-  /// Formats file size in human-readable format
-  String formatFileSize(int bytes) {
-    if (bytes < 1024) {
-      return '$bytes B';
-    } else if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    } else {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-  }
+  // Note: formatFileSize has been removed. Use the extension method instead:
+  // import '../utils/file_size_extension.dart';
+  // Then use: bytes.toHumanReadableSize()
 }
 
 /// Result of image compression operation
@@ -160,7 +156,10 @@ class CompressionResult {
   }
 }
 
-/// Exception thrown when compression fails
+/// Exception thrown when compression fails.
+///
+/// Note: Consider using [errors.CompressionException] from
+/// `core/errors/app_exceptions.dart` for more structured error handling.
 class CompressionException implements Exception {
   final String message;
 

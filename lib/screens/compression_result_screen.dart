@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../core/constants/app_durations.dart';
 import '../utils/theme_provider.dart';
+import '../widgets/animated_theme_toggle.dart';
 import '../widgets/premium_button.dart';
 import '../widgets/premium_alert_dialog.dart';
 import '../widgets/web_navbar.dart';
@@ -61,7 +63,7 @@ class _CompressionResultScreenState extends State<CompressionResultScreen>
     _compressionTime = widget.compressionTime;
 
     _entranceController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: AppDurations.entranceAnimation,
       vsync: this,
     );
 
@@ -78,7 +80,7 @@ class _CompressionResultScreenState extends State<CompressionResultScreen>
     );
 
     _particleController = AnimationController(
-      duration: const Duration(seconds: 30),
+      duration: AppDurations.particleAnimation,
       vsync: this,
     )..repeat();
 
@@ -171,7 +173,12 @@ class _CompressionResultScreenState extends State<CompressionResultScreen>
               child: SlideTransition(
                 position: _slideAnimation,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(32, 100, 32, 32),
+                  padding: EdgeInsets.fromLTRB(
+                    kIsWeb ? 32 : 16,
+                    kIsWeb ? 100 : 16, // Less top padding on mobile (no navbar)
+                    kIsWeb ? 32 : 16,
+                    32,
+                  ),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1200),
@@ -190,17 +197,19 @@ class _CompressionResultScreenState extends State<CompressionResultScreen>
             ),
           ),
 
-          // 3. Web Navbar (Top Layer)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: WebNavbar(
-              onHomeTap:
-                  () =>
-                      Navigator.of(context).popUntil((route) => route.isFirst),
+          // 3. Web Navbar (Top Layer) - Only show on web
+          if (kIsWeb)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: WebNavbar(
+                onHomeTap:
+                    () => Navigator.of(
+                      context,
+                    ).popUntil((route) => route.isFirst),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -248,14 +257,85 @@ class _CompressionResultScreenState extends State<CompressionResultScreen>
   ) {
     return Column(
       children: [
-        _buildHeader(context, primaryColor, center: true),
-        const SizedBox(height: 32),
+        // Mobile header with back button and success icon
+        _buildMobileHeader(context, primaryColor),
+        const SizedBox(height: 24),
         _buildImagePreview(context, isDark, primaryColor),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
         _buildStatsMinimal(context, isDark, primaryColor),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
         _buildActionButtons(context, primaryColor),
       ],
+    );
+  }
+
+  Widget _buildMobileHeader(BuildContext context, Color primaryColor) {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Back button and title section
+          Row(
+            children: [
+              // Back button with gradient background (matching home screen icon style)
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        primaryColor,
+                        Theme.of(context).colorScheme.secondary,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Result',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  Text(
+                    'Compression Complete',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Theme toggle (matching home screen)
+          const AnimatedThemeToggle(size: 24, padding: 12),
+        ],
+      ),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:math' as math;
+import '../core/constants/app_durations.dart';
 import '../utils/constants.dart';
 import '../utils/routes.dart';
 
@@ -22,10 +23,10 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    
+
     // Main entrance animation
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1800),
+      duration: AppDurations.splashAnimation,
       vsync: this,
     );
 
@@ -45,13 +46,14 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Continuous rotation animation
     _rotationController = AnimationController(
-      duration: const Duration(milliseconds: 4000),
+      duration: AppDurations.rotationCycle,
       vsync: this,
     )..repeat();
 
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 2 * math.pi).animate(
-      _rotationController,
-    );
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 2 * math.pi,
+    ).animate(_rotationController);
 
     _controller.forward();
     _navigateToNextScreen();
@@ -65,8 +67,8 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _navigateToNextScreen() async {
-    // Wait for 2.5 seconds
-    await Future.delayed(const Duration(milliseconds: 2500));
+    // Wait for splash delay
+    await Future.delayed(AppDurations.splashDelay);
 
     if (!mounted) return;
 
@@ -84,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Stack(
@@ -94,11 +96,16 @@ class _SplashScreenState extends State<SplashScreen>
             return AnimatedBuilder(
               animation: _rotationController,
               builder: (context, child) {
-                final angle = (index * math.pi / 6) + (_rotationAnimation.value * 0.2);
+                final angle =
+                    (index * math.pi / 6) + (_rotationAnimation.value * 0.2);
                 final distance = 200.0 + (index % 3) * 30;
-                final x = MediaQuery.of(context).size.width / 2 + (math.cos(angle) * distance);
-                final y = MediaQuery.of(context).size.height / 2 + (math.sin(angle) * distance);
-                
+                final x =
+                    MediaQuery.of(context).size.width / 2 +
+                    (math.cos(angle) * distance);
+                final y =
+                    MediaQuery.of(context).size.height / 2 +
+                    (math.sin(angle) * distance);
+
                 return Positioned(
                   left: x,
                   top: y,
@@ -117,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen>
               },
             );
           }),
-          
+
           // Main content
           AnimatedBuilder(
             animation: _controller,
@@ -130,100 +137,114 @@ class _SplashScreenState extends State<SplashScreen>
                     children: [
                       // Creative fractal compression logo
                       ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: SizedBox(
-                      width: 180,
-                      height: 180,
-                      child: AnimatedBuilder(
-                        animation: _rotationController,
-                        builder: (context, child) {
-                          return Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Outer rotating circle
-                              Transform.rotate(
-                                angle: _rotationAnimation.value * 0.5,
-                                child: Container(
-                                  width: 160,
-                                  height: 160,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: primaryColor.withValues(alpha: 0.2),
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              
-                              // Fractal layers - overlapping squares (compression visualization)
-                              for (int i = 0; i < 3; i++)
-                                Transform.rotate(
-                                  angle: (_rotationAnimation.value * 0.3) + (i * math.pi / 6),
-                                  child: Container(
-                                    width: 110 - (i * 25.0),
-                                    height: 110 - (i * 25.0),
-                                    decoration: BoxDecoration(
-                                      color: primaryColor.withValues(
-                                        alpha: (0.15 - i * 0.03).clamp(0.0, 1.0),
+                        scale: _scaleAnimation,
+                        child: SizedBox(
+                          width: 180,
+                          height: 180,
+                          child: AnimatedBuilder(
+                            animation: _rotationController,
+                            builder: (context, child) {
+                              return Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  // Outer rotating circle
+                                  Transform.rotate(
+                                    angle: _rotationAnimation.value * 0.5,
+                                    child: Container(
+                                      width: 160,
+                                      height: 160,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: primaryColor.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          width: 2,
+                                        ),
                                       ),
-                                      borderRadius: BorderRadius.circular(15 - (i * 3.0)),
                                     ),
                                   ),
-                                ),
-                              
-                              // Center icon container (compressed result)
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: primaryColor.withValues(alpha: 0.3),
-                                      blurRadius: 20,
-                                      spreadRadius: 5,
+
+                                  // Fractal layers - overlapping squares (compression visualization)
+                                  for (int i = 0; i < 3; i++)
+                                    Transform.rotate(
+                                      angle:
+                                          (_rotationAnimation.value * 0.3) +
+                                          (i * math.pi / 6),
+                                      child: Container(
+                                        width: 110 - (i * 25.0),
+                                        height: 110 - (i * 25.0),
+                                        decoration: BoxDecoration(
+                                          color: primaryColor.withValues(
+                                            alpha: (0.15 - i * 0.03).clamp(
+                                              0.0,
+                                              1.0,
+                                            ),
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            15 - (i * 3.0),
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  size: 36,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+
+                                  // Center icon container (compressed result)
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryColor.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          blurRadius: 20,
+                                          spreadRadius: 5,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      Icons.image_outlined,
+                                      size: 36,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // App Name
-                  Text(
-                    AppConstants.appName,
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      color: Theme.of(context).textTheme.displayLarge?.color,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 8),
-                  
-                  // Tagline
-                  Text(
-                    AppConstants.appTagline,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 50),
-                  
+
+                      const SizedBox(height: 40),
+
+                      // App Name
+                      Text(
+                        AppConstants.appName,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.displayLarge?.copyWith(
+                          color:
+                              Theme.of(context).textTheme.displayLarge?.color,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Tagline
+                      Text(
+                        AppConstants.appTagline,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(letterSpacing: 0.5),
+                      ),
+
+                      const SizedBox(height: 50),
+
                       // Modern loading dots
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -233,11 +254,18 @@ class _SplashScreenState extends State<SplashScreen>
                               animation: _rotationController,
                               builder: (context, child) {
                                 final delay = i * 0.33;
-                                final progress = (_rotationAnimation.value / (2 * math.pi) + delay) % 1.0;
-                                final scale = 1.0 + (math.sin(progress * 2 * math.pi) * 0.5);
-                                
+                                final progress =
+                                    (_rotationAnimation.value / (2 * math.pi) +
+                                        delay) %
+                                    1.0;
+                                final scale =
+                                    1.0 +
+                                    (math.sin(progress * 2 * math.pi) * 0.5);
+
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
                                   child: Transform.scale(
                                     scale: scale,
                                     child: Container(
@@ -246,7 +274,8 @@ class _SplashScreenState extends State<SplashScreen>
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: primaryColor.withValues(
-                                          alpha: (0.4 + (scale - 1.0) * 0.6).clamp(0.0, 1.0),
+                                          alpha: (0.4 + (scale - 1.0) * 0.6)
+                                              .clamp(0.0, 1.0),
                                         ),
                                       ),
                                     ),
@@ -267,4 +296,3 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
-

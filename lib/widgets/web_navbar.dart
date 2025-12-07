@@ -1,9 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../utils/constants.dart';
-import '../utils/theme_provider.dart';
-import 'theme_switcher.dart';
+import 'animated_theme_toggle.dart';
 
 class WebNavbar extends StatelessWidget {
   final GlobalKey? logoKey;
@@ -19,8 +17,6 @@ class WebNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = themeProvider.isDarkMode;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return ClipRRect(
@@ -114,56 +110,12 @@ class WebNavbar extends StatelessWidget {
 
               const SizedBox(width: 40),
 
-              // Theme toggle
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      primaryColor.withValues(alpha: 0.12),
-                      primaryColor.withValues(alpha: 0.08),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.15),
-                    width: 1,
-                  ),
-                ),
-                child: Material(
-                  key: themeToggleKey,
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      ThemeSwitcher.of(context).changeTheme(() {
-                        themeProvider.toggleTheme();
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(14),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, animation) {
-                          return RotationTransition(
-                            turns: animation,
-                            child: FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: Icon(
-                          isDark
-                              ? Icons.wb_sunny_rounded
-                              : Icons.nightlight_round,
-                          key: ValueKey(isDark),
-                          color: primaryColor,
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              // Theme toggle - using reusable widget with ThemeSwitcher animation
+              AnimatedThemeToggle(
+                widgetKey: themeToggleKey,
+                size: 22,
+                padding: 12,
+                useThemeSwitcherAnimation: true,
               ),
             ],
           ),

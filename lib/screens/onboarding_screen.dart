@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../utils/constants.dart';
 import '../utils/routes.dart';
-import '../utils/theme_provider.dart';
 import '../widgets/onboarding_page.dart';
+import '../widgets/animated_theme_toggle.dart';
+import '../core/constants/app_durations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -27,9 +27,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(AppConstants.onboardingCompleteKey, true);
-    
+
     if (!mounted) return;
-    
+
     // Navigate to home screen
     Navigator.pushReplacementNamed(context, AppRoutes.home);
   }
@@ -43,7 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _nextPage() {
     if (_currentPage < 2) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration: AppDurations.animationMedium,
         curve: Curves.easeInOut,
       );
     }
@@ -52,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _previousPage() {
     if (_currentPage > 0) {
       _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
+        duration: AppDurations.animationMedium,
         curve: Curves.easeInOut,
       );
     }
@@ -61,50 +61,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _skipToLastPage() {
     _pageController.animateToPage(
       2, // Jump to page 3 (index 2)
-      duration: const Duration(milliseconds: 500),
+      duration: AppDurations.animationLong,
       curve: Curves.easeInOut,
-    );
-  }
-
-  Widget _buildThemeToggle(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = themeProvider.isDarkMode;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            themeProvider.toggleTheme();
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) {
-                return RotationTransition(
-                  turns: animation,
-                  child: FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  ),
-                );
-              },
-              child: Icon(
-                isDark ? Icons.wb_sunny : Icons.nightlight_round,
-                key: ValueKey(isDark),
-                color: Theme.of(context).colorScheme.primary,
-                size: 24,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -120,9 +78,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Theme toggle button (sun/moon)
-                  _buildThemeToggle(context),
-                  
+                  // Theme toggle button (sun/moon) - using reusable widget
+                  const AnimatedThemeToggle(size: 24, padding: 12),
+
                   // Skip button (only on first two pages)
                   if (_currentPage < 2)
                     TextButton(
@@ -173,7 +131,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 count: 3,
                 effect: ExpandingDotsEffect(
                   activeDotColor: Theme.of(context).colorScheme.primary,
-                  dotColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                  dotColor: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.2),
                   dotHeight: 8,
                   dotWidth: 8,
                   expansionFactor: 4,

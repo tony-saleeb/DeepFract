@@ -1,12 +1,11 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../utils/constants.dart';
-import '../utils/theme_provider.dart';
 import '../services/image_picker_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/compression_loading_overlay.dart';
+import '../widgets/animated_theme_toggle.dart';
 import 'compression_result_screen.dart';
 import 'web_home_screen.dart';
 
@@ -19,7 +18,7 @@ class HomeScreen extends StatelessWidget {
     if (kIsWeb) {
       return const WebHomeScreen();
     }
-    
+
     // Show mobile design on mobile platforms
     return const _MobileHomeScreen();
   }
@@ -38,7 +37,7 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
 
   Future<void> _selectImage() async {
     final file = await ImagePickerService.showImageSourceDialog(context);
-    
+
     if (file != null) {
       setState(() {
         _selectedImage = file;
@@ -56,7 +55,7 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
     // TODO: Backend Integration - This will be replaced with actual API call
     // Show creative loading overlay with actual image
     final startTime = DateTime.now();
-    
+
     await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
@@ -89,23 +88,22 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => CompressionResultScreen(
-            originalImage: _selectedImage!,
-            originalSize: '10.0 MB', // TODO: Calculate actual size
-            compressedSize: '1.0 MB', // TODO: Get from backend
-            compressionTime: compressionTime,
-          ),
+          builder:
+              (context) => CompressionResultScreen(
+                originalImage: _selectedImage!,
+                originalSize: '10.0 MB', // TODO: Calculate actual size
+                compressedSize: '1.0 MB', // TODO: Get from backend
+                compressionTime: compressionTime,
+              ),
         ),
       );
-      
+
       // After returning from result screen, user can compress another image
       // The selected image is still available
     }
   }
 
   Widget _buildModernHeader(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = themeProvider.isDarkMode;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Container(
@@ -131,7 +129,10 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
                 height: 48,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [primaryColor, Theme.of(context).colorScheme.secondary],
+                    colors: [
+                      primaryColor,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -172,38 +173,9 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
               ),
             ],
           ),
-          
-          // Theme toggle button
-          Container(
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              icon: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return RotationTransition(
-                    turns: animation,
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Icon(
-                  isDark ? Icons.wb_sunny : Icons.nightlight_round,
-                  key: ValueKey(isDark),
-                  color: primaryColor,
-                  size: 24,
-                ),
-              ),
-              onPressed: () {
-                themeProvider.toggleTheme();
-              },
-              tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
-            ),
-          ),
+
+          // Theme toggle button - using reusable widget
+          const AnimatedThemeToggle(size: 24, padding: 12),
         ],
       ),
     );
@@ -216,7 +188,7 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
         children: [
           // Custom modern header
           _buildModernHeader(context),
-          
+
           // Main content
           Expanded(
             child: Center(
@@ -227,76 +199,91 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-              // Display selected image or placeholder
-              Container(
-                width: double.infinity,
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                    width: 2,
-                  ),
-                ),
-                child: _selectedImage != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        child: Image.file(
-                          _selectedImage!,
-                          fit: BoxFit.cover,
+                      // Display selected image or placeholder
+                      Container(
+                        width: double.infinity,
+                        height: 300,
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.3),
+                            width: 2,
+                          ),
                         ),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image,
-                            size: 80,
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No image selected',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Theme.of(context).textTheme.bodyMedium?.color,
-                            ),
-                          ),
-                        ],
+                        child:
+                            _selectedImage != null
+                                ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Image.file(
+                                    _selectedImage!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                                : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.image,
+                                      size: 80,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withValues(alpha: 0.5),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'No image selected',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge?.copyWith(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium?.color,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                       ),
-              ),
 
-              const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-              // Select Image Button
-              CustomButton(
-                text: 'Select Image',
-                icon: Icons.add_photo_alternate,
-                onPressed: _selectImage,
-                isFullWidth: true,
-              ),
+                      // Select Image Button
+                      CustomButton(
+                        text: 'Select Image',
+                        icon: Icons.add_photo_alternate,
+                        onPressed: _selectImage,
+                        isFullWidth: true,
+                      ),
 
-              const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-              // Compress Button (enabled only when image is selected)
-              CustomButton(
-                text: _isProcessing ? 'Processing...' : 'Compress Image',
-                icon: Icons.compress,
-                onPressed: _selectedImage != null && !_isProcessing
-                    ? _compressImage
-                    : () {},
-                isOutlined: true,
-                isFullWidth: true,
-              ),
+                      // Compress Button (enabled only when image is selected)
+                      CustomButton(
+                        text:
+                            _isProcessing ? 'Processing...' : 'Compress Image',
+                        icon: Icons.compress,
+                        onPressed:
+                            _selectedImage != null && !_isProcessing
+                                ? _compressImage
+                                : () {},
+                        isOutlined: true,
+                        isFullWidth: true,
+                      ),
 
-              const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-              // Info text
-              Text(
-                'Backend compression will be implemented in the next phase',
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
+                      // Info text
+                      Text(
+                        'Backend compression will be implemented in the next phase',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
                 ),
@@ -308,4 +295,3 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
     );
   }
 }
-

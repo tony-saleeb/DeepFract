@@ -6,162 +6,240 @@
 
 ---
 
-## Mermaid Code (For Draw.io)
+## Mermaid Code (Note: X markers not supported in Mermaid)
 
 ```mermaid
 sequenceDiagram
-    autonumber
-
     actor User
-    participant App as Application
-    participant Splash as Splash Screen
+    participant Application
+    participant SplashScreen as Splash Screen
     participant Onboarding as Onboarding Module
-    participant Home as Home Screen
+    participant HomeScreen as Home Screen
     participant ImagePicker as Image Picker Service
-    participant Loading as Loading Overlay
+    participant LoadingOverlay as Loading Overlay
     participant Compression as Compression Service
     participant Backend as Backend Server
-    participant Result as Result Screen
-    participant Storage as Local Storage
+    participant ResultScreen as Result Screen
+    participant LocalStorage as Local Storage
 
-    %% ========== PHASE 1: APPLICATION INITIALIZATION ==========
-    rect rgb(255, 255, 200)
-        Note over User, Storage: Phase 1: Application Initialization
+    Note over User,LocalStorage: Phase 1: Application Initialization
+    User->>+Application: 1. Launch Application
+    Application->>+LocalStorage: 2. Load Theme Preference
+    LocalStorage-->>-Application: 3. Return Theme Mode
+    Application->>+SplashScreen: 4. Display Splash Screen
+    SplashScreen->>SplashScreen: 5. Play Animation (2.5 seconds)
 
-        User->>App: Launch Application
-        activate App
-        App->>Storage: Load Theme Preference
-        Storage-->>App: Return Theme Mode
-        App->>Splash: Display Splash Screen
-        activate Splash
-        Splash->>Splash: Play Animation (2.5 seconds)
+    Note over User,LocalStorage: Phase 2: User Onboarding
+
+    alt Web Platform
+        SplashScreen->>HomeScreen: 6. Direct Navigation
+    else Mobile Platform
+        SplashScreen->>+Onboarding: 7. Navigate to Onboarding
+        Onboarding-->>User: 8. Screen 1 - Compression Power
+        User->>Onboarding: 9. Next
+        Onboarding-->>User: 10. Screen 2 - AI Technology
+        User->>Onboarding: 11. Next
+        Onboarding-->>User: 12. Screen 3 - Upload Guide
+        User->>Onboarding: 13. Get Started
+        Onboarding->>+LocalStorage: 14. Save Completion Status
+        deactivate LocalStorage
+        Onboarding->>-HomeScreen: 15. Navigate to Home
+    end
+    deactivate SplashScreen
+
+    Note over User,LocalStorage: Phase 3: Image Selection
+    activate HomeScreen
+    HomeScreen-->>User: 16. Display Main Interface
+    User->>HomeScreen: 17. Select Image
+    HomeScreen->>+ImagePicker: 18. Open Image Source Dialog
+    ImagePicker-->>User: 19. Show Options (Gallery/Camera)
+
+    alt Gallery
+        User->>ImagePicker: 20. Choose Gallery
+        ImagePicker->>ImagePicker: 21. Access Device Storage
+    else Camera
+        User->>ImagePicker: 22. Choose Camera
+        ImagePicker->>ImagePicker: 23. Capture Photo
     end
 
-    %% ========== PHASE 2: ONBOARDING ==========
-    rect rgb(255, 255, 200)
-        Note over User, Storage: Phase 2: User Onboarding (Mobile Only)
+    ImagePicker-->>-HomeScreen: 24. Return Image File
+    HomeScreen-->>User: 25. Display Image Preview
 
-        alt Web Platform
-            Splash->>Home: Direct Navigation
-        else Mobile Platform
-            Splash->>Onboarding: Navigate to Onboarding
-            deactivate Splash
-            activate Onboarding
-            Onboarding->>User: Screen 1 - Compression Power
-            User->>Onboarding: Next
-            Onboarding->>User: Screen 2 - AI Technology
-            User->>Onboarding: Next
-            Onboarding->>User: Screen 3 - Upload Guide
-            User->>Onboarding: Get Started
-            Onboarding->>Storage: Save Completion Status
-            Onboarding->>Home: Navigate to Home
-            deactivate Onboarding
-        end
+    Note over User,LocalStorage: Phase 4: AI Compression Process
+    User->>HomeScreen: 26. Compress Image
+    HomeScreen->>+LoadingOverlay: 27. Show Loading Overlay
+    LoadingOverlay-->>User: 28. Display Progress Animation
+    LoadingOverlay->>+Compression: 29. Submit Image
+    Compression->>+Backend: 30. POST /api/compress (Image Data)
+    Backend->>Backend: 31. Convert to Grayscale
+    Backend->>Backend: 32. Apply Fractal Decomposition
+    Backend->>Backend: 33. Execute AI Optimization
+    Backend-->>-Compression: 34. Return Compressed Image + Metadata
+    Compression-->>-LoadingOverlay: 35. Return Result
+    LoadingOverlay->>LoadingOverlay: 36. Complete Animation
+    LoadingOverlay-->>-HomeScreen: 37. Close Overlay
+    deactivate HomeScreen
+
+    Note over User,LocalStorage: Phase 5: Result Presentation
+    HomeScreen->>+ResultScreen: 38. Navigate with Results
+    ResultScreen-->>User: 39. Display Compressed Image
+    ResultScreen-->>User: 40. Show Statistics (Size, Ratio, Time)
+
+    alt Download
+        User->>ResultScreen: 41. Download Image
+        ResultScreen->>+LocalStorage: 42. Save to Device
+        deactivate LocalStorage
+        ResultScreen-->>User: 43. Confirm Download
+    else Share
+        User->>ResultScreen: 44. Share Image
+        ResultScreen-->>User: 45. Open Share Dialog
+    else New Image
+        User->>ResultScreen: 46. Compress Another
+        ResultScreen-->>HomeScreen: 47. Return to Home
     end
+    deactivate ResultScreen
+    deactivate Application
 
-    %% ========== PHASE 3: IMAGE SELECTION ==========
-    rect rgb(255, 255, 200)
-        Note over User, Storage: Phase 3: Image Selection
-
-        activate Home
-        Home->>User: Display Main Interface
-        User->>Home: Select Image
-        Home->>ImagePicker: Open Image Source Dialog
-        activate ImagePicker
-        ImagePicker->>User: Show Options (Gallery/Camera)
-
-        alt Gallery
-            User->>ImagePicker: Choose Gallery
-            ImagePicker->>ImagePicker: Access Device Storage
-        else Camera
-            User->>ImagePicker: Choose Camera
-            ImagePicker->>ImagePicker: Capture Photo
-        end
-
-        ImagePicker-->>Home: Return Image File
-        deactivate ImagePicker
-        Home->>User: Display Image Preview
-    end
-
-    %% ========== PHASE 4: COMPRESSION PROCESS ==========
-    rect rgb(255, 255, 200)
-        Note over User, Storage: Phase 4: AI Compression Process
-
-        User->>Home: Compress Image
-        Home->>Loading: Show Loading Overlay
-        activate Loading
-        Loading->>User: Display Progress Animation
-        Loading->>Compression: Submit Image
-        activate Compression
-
-        Compression->>Backend: POST /api/compress (Image Data)
-        activate Backend
-        Backend->>Backend: Convert to Grayscale
-        Backend->>Backend: Apply Fractal Decomposition
-        Backend->>Backend: Execute AI Optimization
-        Backend-->>Compression: Return Compressed Image + Metadata
-        deactivate Backend
-
-        Compression-->>Loading: Return Result
-        deactivate Compression
-        Loading->>Loading: Complete Animation
-        Loading-->>Home: Close Overlay
-        deactivate Loading
-    end
-
-    %% ========== PHASE 5: RESULT DISPLAY ==========
-    rect rgb(255, 255, 200)
-        Note over User, Storage: Phase 5: Result Presentation
-
-        Home->>Result: Navigate with Results
-        deactivate Home
-        activate Result
-        Result->>User: Display Compressed Image
-        Result->>User: Show Statistics (Size, Ratio, Time)
-
-        alt Download
-            User->>Result: Download Image
-            Result->>Storage: Save to Device
-            Result-->>User: Confirm Download
-        else Share
-            User->>Result: Share Image
-            Result-->>User: Open Share Dialog
-        else New Image
-            User->>Result: Compress Another
-            Result-->>Home: Return to Home
-            deactivate Result
-        end
-    end
-
-    deactivate App
+    Note over User,LocalStorage: ✕ End of Sequence ✕
 ```
 
 ---
 
-## Arrow Types
+## ⚠️ Mermaid Limitation
 
-| Syntax | Type         | Usage             |
-| ------ | ------------ | ----------------- |
-| `->>`  | Solid arrow  | Request / Action  |
-| `-->>` | Dashed arrow | Return / Response |
+**Mermaid does NOT support X destruction markers** like PlantUML does.
 
----
-
-## Return Arrows (Dashed)
-
-All return/response arrows now use `-->>`:
-
-- `Storage-->>App: Return Theme Mode`
-- `ImagePicker-->>Home: Return Image File`
-- `Backend-->>Compression: Return Compressed Image + Metadata`
-- `Compression-->>Loading: Return Result`
-- `Loading-->>Home: Close Overlay`
-- `Result-->>User: Confirm Download`
-- `Result-->>User: Open Share Dialog`
-- `Result-->>Home: Return to Home`
+For X markers, use **PlantUML** instead:
 
 ---
 
-## Generate at:
+## PlantUML Version (With X Destruction Markers)
 
-**Draw.io: Arrange → Insert → Advanced → Mermaid**
+```plantuml
+@startuml DeepFract_Sequence
+
+actor User
+participant Application
+participant "Splash Screen" as SplashScreen
+participant "Onboarding Module" as Onboarding
+participant "Home Screen" as HomeScreen
+participant "Image Picker Service" as ImagePicker
+participant "Loading Overlay" as LoadingOverlay
+participant "Compression Service" as Compression
+participant "Backend Server" as Backend
+participant "Result Screen" as ResultScreen
+participant "Local Storage" as LocalStorage
+
+== Phase 1: Application Initialization ==
+User -> Application: 1. Launch Application
+activate Application
+Application -> LocalStorage: 2. Load Theme Preference
+activate LocalStorage
+LocalStorage --> Application: 3. Return Theme Mode
+deactivate LocalStorage
+Application -> SplashScreen: 4. Display Splash Screen
+activate SplashScreen
+SplashScreen -> SplashScreen: 5. Play Animation (2.5 seconds)
+
+== Phase 2: User Onboarding ==
+alt Web Platform
+    SplashScreen -> HomeScreen: 6. Direct Navigation
+else Mobile Platform
+    SplashScreen -> Onboarding: 7. Navigate to Onboarding
+    activate Onboarding
+    Onboarding --> User: 8. Screen 1 - Compression Power
+    User -> Onboarding: 9. Next
+    Onboarding --> User: 10. Screen 2 - AI Technology
+    User -> Onboarding: 11. Next
+    Onboarding --> User: 12. Screen 3 - Upload Guide
+    User -> Onboarding: 13. Get Started
+    Onboarding -> LocalStorage: 14. Save Completion Status
+    Onboarding -> HomeScreen: 15. Navigate to Home
+    deactivate Onboarding
+end
+deactivate SplashScreen
+
+== Phase 3: Image Selection ==
+activate HomeScreen
+HomeScreen --> User: 16. Display Main Interface
+User -> HomeScreen: 17. Select Image
+HomeScreen -> ImagePicker: 18. Open Image Source Dialog
+activate ImagePicker
+ImagePicker --> User: 19. Show Options (Gallery/Camera)
+
+alt Gallery
+    User -> ImagePicker: 20. Choose Gallery
+    ImagePicker -> ImagePicker: 21. Access Device Storage
+else Camera
+    User -> ImagePicker: 22. Choose Camera
+    ImagePicker -> ImagePicker: 23. Capture Photo
+end
+
+ImagePicker --> HomeScreen: 24. Return Image File
+deactivate ImagePicker
+HomeScreen --> User: 25. Display Image Preview
+
+== Phase 4: AI Compression Process ==
+User -> HomeScreen: 26. Compress Image
+HomeScreen -> LoadingOverlay: 27. Show Loading Overlay
+activate LoadingOverlay
+LoadingOverlay --> User: 28. Display Progress Animation
+LoadingOverlay -> Compression: 29. Submit Image
+activate Compression
+Compression -> Backend: 30. POST /api/compress (Image Data)
+activate Backend
+Backend -> Backend: 31. Convert to Grayscale
+Backend -> Backend: 32. Apply Fractal Decomposition
+Backend -> Backend: 33. Execute AI Optimization
+Backend --> Compression: 34. Return Compressed Image + Metadata
+deactivate Backend
+Compression --> LoadingOverlay: 35. Return Result
+deactivate Compression
+LoadingOverlay -> LoadingOverlay: 36. Complete Animation
+LoadingOverlay --> HomeScreen: 37. Close Overlay
+deactivate LoadingOverlay
+deactivate HomeScreen
+
+== Phase 5: Result Presentation ==
+HomeScreen -> ResultScreen: 38. Navigate with Results
+activate ResultScreen
+ResultScreen --> User: 39. Display Compressed Image
+ResultScreen --> User: 40. Show Statistics (Size, Ratio, Time)
+
+alt Download
+    User -> ResultScreen: 41. Download Image
+    ResultScreen -> LocalStorage: 42. Save to Device
+    ResultScreen --> User: 43. Confirm Download
+else Share
+    User -> ResultScreen: 44. Share Image
+    ResultScreen --> User: 45. Open Share Dialog
+else New Image
+    User -> ResultScreen: 46. Compress Another
+    ResultScreen --> HomeScreen: 47. Return to Home
+end
+deactivate ResultScreen
+deactivate Application
+
+' X Destruction markers
+destroy User
+destroy Application
+destroy SplashScreen
+destroy Onboarding
+destroy HomeScreen
+destroy ImagePicker
+destroy LoadingOverlay
+destroy Compression
+destroy Backend
+destroy ResultScreen
+destroy LocalStorage
+
+@enduml
+```
+
+---
+
+## Generate PlantUML at:
+
+**http://www.plantuml.com/plantuml/uml/**
+
+The PlantUML version will show the **X destruction markers** at the bottom of each lifeline.
