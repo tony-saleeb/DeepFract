@@ -144,10 +144,9 @@ class _UploadModalState extends State<UploadModal> {
 
         if (xFile != null) {
           bytes = await xFile.readAsBytes();
-          // Create a temporary file for web
-          file = File(
-            'temp_image_${DateTime.now().millisecondsSinceEpoch}.jpg',
-          );
+          // On web, we don't create a File object as it won't be valid
+          // The bytes are sufficient for displaying and processing the image
+          file = null;
         }
       } else {
         file =

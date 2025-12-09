@@ -15,6 +15,7 @@ class ImagePickerService {
       );
       return image;
     } catch (e) {
+      debugPrint('ImagePickerService: Error picking image from gallery: $e');
       return null;
     }
   }
@@ -31,6 +32,9 @@ class ImagePickerService {
         if (kIsWeb) {
           // On web, we can't create real files, so we'll return null
           // and handle the XFile directly in the UI
+          debugPrint(
+            'ImagePickerService: Web platform - returning null File, use bytes instead',
+          );
           return null;
         } else {
           return File(image.path);
@@ -38,7 +42,7 @@ class ImagePickerService {
       }
       return null;
     } catch (e) {
-      // Error picking image from gallery
+      debugPrint('ImagePickerService: Error picking image from gallery: $e');
       return null;
     }
   }
@@ -52,6 +56,7 @@ class ImagePickerService {
       );
       return image;
     } catch (e) {
+      debugPrint('ImagePickerService: Error capturing from camera: $e');
       return null;
     }
   }
@@ -68,6 +73,9 @@ class ImagePickerService {
         if (kIsWeb) {
           // On web, we can't create real files, so we'll return null
           // and handle the XFile directly in the UI
+          debugPrint(
+            'ImagePickerService: Web platform - returning null File, use bytes instead',
+          );
           return null;
         } else {
           return File(image.path);
@@ -75,7 +83,7 @@ class ImagePickerService {
       }
       return null;
     } catch (e) {
-      // Error capturing image from camera
+      debugPrint('ImagePickerService: Error capturing from camera: $e');
       return null;
     }
   }
@@ -83,7 +91,7 @@ class ImagePickerService {
   /// Show a dialog to choose between camera and gallery
   static Future<File?> showImageSourceDialog(BuildContext context) async {
     final ImagePickerService service = ImagePickerService();
-    
+
     return showModalBottomSheet<File?>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -98,10 +106,7 @@ class ImagePickerService {
               children: [
                 const Text(
                   'Choose Image Source',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 20),
                 ListTile(
@@ -132,4 +137,3 @@ class ImagePickerService {
     );
   }
 }
-

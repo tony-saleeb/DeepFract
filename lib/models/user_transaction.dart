@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/file_size_extension.dart';
 
 /// Represents a compression transaction for a user.
 class UserTransaction {
@@ -47,17 +48,12 @@ class UserTransaction {
   }
 
   /// Human-readable original size
-  String get formattedOriginalSize => _formatBytes(originalSizeBytes);
+  String get formattedOriginalSize => originalSizeBytes.toHumanReadableSize();
 
   /// Human-readable compressed size
-  String get formattedCompressedSize => _formatBytes(compressedSizeBytes);
+  String get formattedCompressedSize =>
+      compressedSizeBytes.toHumanReadableSize();
 
   /// Human-readable compression ratio
   String get formattedRatio => '${compressionRatio.toStringAsFixed(1)}%';
-
-  String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-  }
 }

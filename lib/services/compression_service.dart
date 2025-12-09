@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../utils/file_size_extension.dart';
 import '../core/constants/app_durations.dart';
-import '../core/errors/app_exceptions.dart' as errors;
 
 /// Service for handling image compression through AI-powered backend.
 ///
@@ -157,13 +156,30 @@ class CompressionResult {
 }
 
 /// Exception thrown when compression fails.
-///
-/// Note: Consider using [errors.CompressionException] from
-/// `core/errors/app_exceptions.dart` for more structured error handling.
 class CompressionException implements Exception {
   final String message;
+  final String? code;
+  final dynamic originalError;
 
-  CompressionException(this.message);
+  const CompressionException(this.message, {this.code, this.originalError});
+
+  /// Server returned an error
+  factory CompressionException.serverError(int statusCode) =>
+      CompressionException('Server error: $statusCode', code: 'SERVER_ERROR');
+
+  /// Network connection failed
+  factory CompressionException.networkError([String? details]) =>
+      CompressionException(
+        details ?? 'Network connection failed',
+        code: 'NETWORK_ERROR',
+      );
+
+  /// General compression failure
+  factory CompressionException.failed(dynamic error) => CompressionException(
+    'Failed to compress image: $error',
+    code: 'FAILED',
+    originalError: error,
+  );
 
   @override
   String toString() => 'CompressionException: $message';

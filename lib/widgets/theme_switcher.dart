@@ -50,6 +50,14 @@ class ThemeSwitcherState extends State<ThemeSwitcher> {
   }
 
   @override
+  void dispose() {
+    // Dispose the captured image to prevent memory leak
+    _image?.dispose();
+    _image = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -63,6 +71,8 @@ class ThemeSwitcherState extends State<ThemeSwitcher> {
                 curve: Curves.easeInOut,
                 opacity: _isSwitching ? 1.0 : 0.0,
                 onEnd: () {
+                  // Dispose image when animation completes
+                  _image?.dispose();
                   setState(() {
                     _image = null;
                   });

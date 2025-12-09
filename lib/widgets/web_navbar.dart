@@ -130,7 +130,28 @@ class WebNavbar extends StatelessWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: text == 'Home' ? onHomeTap : () {},
+        onTap: () {
+          switch (text) {
+            case 'Home':
+              onHomeTap?.call();
+              break;
+            case 'About':
+              Navigator.pushNamed(context, '/about');
+              break;
+            case 'Help':
+              // Help page not implemented yet - show snackbar
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Help section coming soon!'),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+              break;
+          }
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
