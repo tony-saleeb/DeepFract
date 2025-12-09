@@ -72,9 +72,9 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    // Web: Skip onboarding, go directly to home
+    // Web: Go to auth screen (auth screen will redirect to home if already logged in)
     if (kIsWeb) {
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      Navigator.pushReplacementNamed(context, AppRoutes.auth);
       return;
     }
 

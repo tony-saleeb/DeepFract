@@ -5,7 +5,6 @@ import '../utils/constants.dart';
 import '../services/image_picker_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/compression_loading_overlay.dart';
-import '../widgets/animated_theme_toggle.dart';
 import 'compression_result_screen.dart';
 import 'web_home_screen.dart';
 
@@ -173,9 +172,19 @@ class _MobileHomeScreenState extends State<_MobileHomeScreen> {
               ),
             ],
           ),
-
-          // Theme toggle button - using reusable widget
-          const AnimatedThemeToggle(size: 24, padding: 12),
+          // Profile button
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, '/profile'),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(Icons.person_outline, color: primaryColor, size: 26),
+            ),
+          ),
         ],
       ),
     );

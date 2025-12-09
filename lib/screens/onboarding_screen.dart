@@ -30,8 +30,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     if (!mounted) return;
 
-    // Navigate to home screen
-    Navigator.pushReplacementNamed(context, AppRoutes.home);
+    // Navigate to auth screen (user must log in)
+    Navigator.pushReplacementNamed(context, AppRoutes.auth);
   }
 
   void _onPageChanged(int page) {

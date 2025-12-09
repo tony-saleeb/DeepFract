@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'utils/theme.dart';
 import 'utils/theme_provider.dart';
 import 'utils/routes.dart';
 import 'widgets/theme_switcher.dart';
 
-import 'package:flutter/services.dart';
-
-void main() {
+Future<void> main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase (only if not already initialized)
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
 
   // Make system bars transparent
   SystemChrome.setSystemUIOverlayStyle(
