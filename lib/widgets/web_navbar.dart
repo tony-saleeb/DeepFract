@@ -1,19 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
-import 'animated_theme_toggle.dart';
 
 class WebNavbar extends StatelessWidget {
   final GlobalKey? logoKey;
-  final GlobalKey? themeToggleKey;
+  final GlobalKey? profileKey;
   final VoidCallback? onHomeTap;
 
-  const WebNavbar({
-    super.key,
-    this.logoKey,
-    this.themeToggleKey,
-    this.onHomeTap,
-  });
+  const WebNavbar({super.key, this.logoKey, this.profileKey, this.onHomeTap});
 
   @override
   Widget build(BuildContext context) {
@@ -110,12 +104,39 @@ class WebNavbar extends StatelessWidget {
 
               const SizedBox(width: 40),
 
-              // Theme toggle - using reusable widget with ThemeSwitcher animation
-              AnimatedThemeToggle(
-                widgetKey: themeToggleKey,
-                size: 22,
-                padding: 12,
-                useThemeSwitcherAnimation: true,
+              // Profile button - matching mobile experience
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  key: profileKey,
+                  onTap: () => Navigator.pushNamed(context, '/profile'),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          primaryColor.withValues(alpha: 0.15),
+                          Theme.of(
+                            context,
+                          ).colorScheme.secondary.withValues(alpha: 0.15),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.2),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.person_outline,
+                      color: primaryColor,
+                      size: 24,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

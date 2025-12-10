@@ -1,268 +1,330 @@
-# Use Case Diagram - Database Entities Addition
+# Use Case Diagram - Required Changes to Match System
 
-> **Objective**: Add ONLY database-related entities while keeping the existing structure exactly as-is  
-> **Standard**: UML 2.0 Academic Standards
-
----
-
-## Overview
-
-This document outlines the additions needed to include database entities in the DeepFract Use Case Diagram according to UML academic standards.
+> **Objective**: Align the current Use Case Diagram with the complete DeepFract system  
+> **Standard**: UML 2.0 Academic Standards  
+> **Date**: December 2024
 
 ---
 
-## Database Entity to Add
+## Current vs. Required Comparison
 
-According to **UML academic standards**, when a system interacts with a database, you add it as a **Secondary Actor** (external system). This is placed on the **right side** of the system boundary.
+### Current Diagram Analysis
 
-### New Actors to Add
+Your current diagram includes:
 
-| Entity | Type | Symbol | Placement |
-|--------|------|--------|-----------|
-| **Firebase Auth** | Secondary Actor | Stick figure OR system icon | Right side |
-| **Cloud Firestore** | Secondary Actor | Cylinder icon | Right side, below Firebase Auth |
+| Actor | Use Cases |
+|-------|-----------|
+| **User** | Login, Sign up, Switch Theme, View Home Screen, Take A Photo, Select Image, Press Compress Button, View Compressed Image, View Compression Statistics, Share Compressed Image, Download Compressed Image |
+| **Clerk** | Monitor System Performance, Manage AI Models |
 
----
+### Missing Elements (Must Add)
 
-## Database Connections (New Relationships)
-
-### Firebase Authentication Actor
-
-The **Firebase Auth** actor should connect to these use cases:
-
-| Use Case | Relationship | Reason |
-|----------|--------------|--------|
-| **User Login** | ← (line) | Authenticates user credentials |
-| **User Registration** | ← (line) | Creates new user account |
-| **Google Sign-In** | ← (line) | OAuth authentication |
-| **Password Reset** | ← (line) | Sends reset email |
-| **Check Auth State** | ← (line) | Verifies session |
-
-### Cloud Firestore Actor
-
-The **Cloud Firestore** actor should connect to these use cases:
-
-| Use Case | Relationship | Reason |
-|----------|--------------|--------|
-| **Save Compression Transaction** | ← (line) | Stores transaction record |
-| **View Compression History** | ← (line) | Retrieves past compressions |
-| **Get Compression Statistics** | ← (line) | Reads aggregated stats |
-| **Delete Transaction** | ← (line) | Removes transaction record |
-| **Store User Preferences** | ← (line) | Saves theme settings |
+| Category | Missing Element | Priority |
+|----------|-----------------|----------|
+| **Actor** | Firebase Auth (Secondary) | 🔴 High |
+| **Actor** | Cloud Firestore (Secondary) | 🔴 High |
+| **Use Case** | Google Sign-In | 🔴 High |
+| **Use Case** | Password Reset | 🟡 Medium |
+| **Use Case** | View Compression History | 🟡 Medium |
+| **Use Case** | Save Compression Transaction | 🟡 Medium |
+| **Use Case** | Store User Preferences | 🟢 Low |
 
 ---
 
-## Visual Representation of Changes
+## Visual Representation - BEFORE vs AFTER
 
+### BEFORE (Current Diagram)
 ```
-                    ┌─────────────────────────────────────────────────────────────────┐
-                    │                    DeepFract System                              │
-                    │                                                                  │
-    ○               │    ┌──────────────────┐                                         │
-   /│\   ──────────►│    │   User Login     │◄─────────────────────────────────────────┼──────  ┌───────┐
-   / \              │    └──────────────────┘                                         │        │Firebase│
-  User              │           │                                                     │        │  Auth  │
-                    │           ▼                                                     │        └───────┘
-                    │    ┌──────────────────┐                                         │
-                    │    │ User Registration │◄────────────────────────────────────────┤
-                    │    └──────────────────┘                                         │
-                    │           │                                                     │
-                    │           ▼                                                     │
-                    │    ┌──────────────────┐                                         │
-                    │    │  Google Sign-In  │◄─────────────────────────────────────────┤
-                    │    └──────────────────┘                                         │
-                    │                                                                  │
-                    │    ┌──────────────────┐                                         │
-                    │    │ Upload Image     │                                         │
-                    │    └──────────────────┘                                         │
-                    │           │                                                     │
-                    │           ▼                                                     │
-                    │    ┌──────────────────┐                                         │
-                    │    │ Compress Image   │───────────┐                             │
-                    │    └──────────────────┘           │                             │
-                    │           │                       │                             │
-                    │           ▼                       ▼                             │
-                    │    ┌──────────────────┐    ┌──────────────────┐                 │
-                    │    │View Compressed   │    │Save Compression  │◄────────────────┼──────  ╭─╮
-                    │    │     Image        │    │   Transaction    │                 │        │ │
-                    │    └──────────────────┘    └──────────────────┘                 │        ╰─╯
-                    │           │                       │                             │       Cloud
-                    │           ▼                       │                             │     Firestore
-                    │    ┌──────────────────┐           │                             │
-                    │    │Download/Share    │           │                             │
-                    │    │     Image        │           ▼                             │
-                    │    └──────────────────┘    ┌──────────────────┐                 │
-                    │                            │View Compression  │◄────────────────┤
-                    │    ┌──────────────────┐    │     History      │                 │
-                    │    │  Switch Theme    │    └──────────────────┘                 │
-                    │    └──────────────────┘           │                             │
-                    │           │                       ▼                             │
-                    │           └────────────────►┌──────────────────┐                 │
-                    │                            │Store User        │◄────────────────┤
-                    │                            │  Preferences     │                 │
-                    │                            └──────────────────┘                 │
-                    │                                                                  │
-                    └─────────────────────────────────────────────────────────────────┘
+                    ┌─────────────────────────────────────────────────────────────┐
+                    │                    DeepFract System                          │
+                    │                                                              │
+    ○               │    (login)  (sign up)  (Switch Theme)                       │
+   /│\   ───────────│                                                              │
+   / \              │    (View Home Screen)                                        │          ○
+  User              │         │                                                    │         /│\
+                    │    <<extend>>──────┬──────<<extend>>                         │         / \
+                    │         │          │          │                              │        Clerk
+                    │   (Take A Photo) (Select Image)                              │
+                    │                                                              │
+                    │    (Press Compress Button)                                   │
+                    │         │──────<<include>>───────────────┐                   │
+                    │                                          │                   │
+                    │                              (View Compressed Image)         │
+                    │                                   │                          │
+                    │              ┌────<<include>>─────┼─────<<extend>>───┐       │
+                    │              │                    │                  │       │
+                    │    (View Compression    (Share Compressed   (Download       │
+                    │     Statistics)              Image)       Compressed Image)  │
+                    │                                                              │
+                    └──────────────────────────────────────────────────────────────┘
+```
+
+### AFTER (Required Changes Applied)
+```
+                    ┌─────────────────────────────────────────────────────────────────────────────────────┐
+                    │                              DeepFract System                                        │
+                    │                                                                                      │
+    ○               │    (login)────────────────────────────────────────────────────────────────┐         │      ┌───────────┐
+   /│\   ───────────│         │                                                                 │         │      │  Firebase │
+   / \              │    (sign up)──────────────────────────────────────────────────────────────┼─────────┼──────│   Auth    │
+  User              │         │                                                                 │         │      └───────────┘
+                    │    (Google Sign-In) ★NEW──────────────────────────────────────────────────┤         │
+                    │         │                                                                 │         │
+                    │    (Password Reset) ★NEW──────────────────────────────────────────────────┘         │
+                    │                                                                                      │
+                    │    (Switch Theme)                                                                    │
+                    │         │──────<<extend>>────────────────────────────────┐                          │
+                    │                                                          │                          │
+                    │    (View Home Screen)                       (Store User Preferences) ★NEW──────────┐│      ╭─────────╮
+                    │         │                                                                          ││      │  Cloud  │
+                    │    <<extend>>──────┬──────<<extend>>                                               │├──────│Firestore│
+                    │         │          │                                                               ││      ╰─────────╯
+                    │   (Take A Photo) (Select Image)                                                    ││
+                    │                                                                                    ││
+                    │    (Press Compress Button)                                                         ││
+                    │         │──────<<include>>───────────────┐                                         ││
+                    │                                          │                                         ││
+                    │                              (View Compressed Image)                               ││
+                    │                                   │                                                ││
+                    │              ┌────<<include>>─────┼─────<<extend>>───┐                             ││
+                    │              │                    │                  │                             ││
+                    │    (View Compression    (Share Compressed   (Download Compressed                   ││
+                    │     Statistics)              Image)               Image)                           ││
+                    │                                                                                    ││
+                    │    (View Compression History) ★NEW─────────────────────────────────────────────────┤│
+                    │                                                                                    ││          ○
+                    │    (Save Compression Transaction) ★NEW─────────────────────────────────────────────┘│         /│\
+                    │         ↑                                                                            │         / \
+                    │         │ (Called after Press Compress Button)                                       │        Clerk
+                    │                                                                                      │
+                    │    (Monitor System Performance)──────────────────────────────────────────────────────┼──Clerk
+                    │    (Manage AI Models)────────────────────────────────────────────────────────────────┼──Clerk
+                    │                                                                                      │
+                    └──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Exact Changes to Make
+## Detailed Changes Required
 
-### Step 1: Add Firebase Auth Actor
-- **Symbol**: Stick figure OR rectangle with system name
-- **Position**: Right side of diagram
-- **Label**: `Firebase Auth`
+### Step 1: Add Secondary Actors (Right Side)
 
-### Step 2: Add Cloud Firestore Actor
-- **Symbol**: Cylinder icon (database symbol) OR stick figure
-- **Position**: Right side of diagram, below Firebase Auth
-- **Label**: `Cloud Firestore` (or `Firestore DB`)
+| Actor | Symbol | Position | Description |
+|-------|--------|----------|-------------|
+| **Firebase Auth** | Stick figure or `<<system>>` box | Right side, top | Handles all authentication |
+| **Cloud Firestore** | Cylinder icon (database) | Right side, below Firebase Auth | Handles data persistence |
 
-### Step 3: Draw Connection Lines
+### Step 2: Add Missing Use Cases
 
-Draw simple lines (not arrows) from actors to their related use cases:
-
-**Firebase Auth connections:**
+#### 2.1 Google Sign-In
 ```
-Firebase Auth ──────── User Login
-Firebase Auth ──────── User Registration  
-Firebase Auth ──────── Google Sign-In
-Firebase Auth ──────── Password Reset
-Firebase Auth ──────── Check Auth State
+Position: Near login/sign up use cases
+Connections:
+  - User ───────── (Google Sign-In)
+  - (Google Sign-In) ─────── Firebase Auth
 ```
 
-**Cloud Firestore connections:**
+#### 2.2 Password Reset
 ```
-Cloud Firestore ──────── Save Compression Transaction
-Cloud Firestore ──────── View Compression History  
-Cloud Firestore ──────── Get Compression Statistics
-Cloud Firestore ──────── Delete Transaction
-Cloud Firestore ──────── Store User Preferences
+Position: Near login use case
+Connections:
+  - User ───────── (Password Reset)
+  - (Password Reset) ─────── Firebase Auth
 ```
 
-> [!NOTE]
-> In UML, secondary actors use **simple lines** (association), not arrows. The line shows the actor participates in the use case.
+#### 2.3 View Compression History
+```
+Position: Below main compression flow
+Connections:
+  - User ───────── (View Compression History)
+  - (View Compression History) ─────── Cloud Firestore
+```
+
+#### 2.4 Save Compression Transaction
+```
+Position: Near View Compressed Image
+Relationship: <<include>> from Press Compress Button (internally triggered)
+Connections:
+  - (Press Compress Button) ...<<include>>... (Save Compression Transaction)
+  - (Save Compression Transaction) ─────── Cloud Firestore
+```
+
+#### 2.5 Store User Preferences
+```
+Position: Near Switch Theme
+Relationship: <<extend>> from Switch Theme
+Connections:
+  - (Switch Theme) ...<<extend>>... (Store User Preferences)
+  - (Store User Preferences) ─────── Cloud Firestore
+```
+
+### Step 3: Add Database Connection Lines
+
+> [!IMPORTANT]
+> In UML, connections to secondary actors use **simple lines** (associations), NOT arrows.
+
+#### Firebase Auth Connections:
+| From Use Case | To Actor | Line Type |
+|---------------|----------|-----------|
+| Login | Firebase Auth | ─────── (solid line) |
+| Sign up | Firebase Auth | ─────── (solid line) |
+| Google Sign-In | Firebase Auth | ─────── (solid line) |
+| Password Reset | Firebase Auth | ─────── (solid line) |
+
+#### Cloud Firestore Connections:
+| From Use Case | To Actor | Line Type |
+|---------------|----------|-----------|
+| Save Compression Transaction | Cloud Firestore | ─────── (solid line) |
+| View Compression History | Cloud Firestore | ─────── (solid line) |
+| Store User Preferences | Cloud Firestore | ─────── (solid line) |
 
 ---
 
-## Complete Use Case List
+## Complete Use Case List (Final)
 
-### User Actor Use Cases (Primary)
+### User Actor (Primary - Left Side)
+| ID | Use Case | Relationships |
+|----|----------|---------------|
+| UC-01 | Login | → Firebase Auth |
+| UC-02 | Sign up | → Firebase Auth |
+| UC-03 | Google Sign-In ★NEW | → Firebase Auth |
+| UC-04 | Password Reset ★NEW | → Firebase Auth |
+| UC-05 | Switch Theme | <<extend>> Store User Preferences |
+| UC-06 | View Home Screen | <<extend>> Take A Photo, <<extend>> Select Image |
+| UC-07 | Take A Photo | - |
+| UC-08 | Select Image | - |
+| UC-09 | Press Compress Button | <<include>> View Compressed Image, <<include>> Save Compression Transaction |
+| UC-10 | View Compressed Image | <<include>> View Compression Statistics, <<extend>> Share, <<extend>> Download |
+| UC-11 | View Compression Statistics | - |
+| UC-12 | Share Compressed Image | - |
+| UC-13 | Download Compressed Image | - |
+| UC-14 | View Compression History ★NEW | → Cloud Firestore |
+| UC-15 | Save Compression Transaction ★NEW | → Cloud Firestore |
+| UC-16 | Store User Preferences ★NEW | → Cloud Firestore |
 
-| Use Case | Description |
-|----------|-------------|
-| View Splash Screen | Initial branding display |
-| Complete Onboarding | 3-page introduction flow |
-| User Login | Email/password authentication |
-| User Registration | Create new account |
-| Google Sign-In | OAuth authentication |
-| Password Reset | Email-based recovery |
-| Upload Image | Select from gallery/camera |
-| Compress Image | AI-powered compression |
-| View Compressed Image | See compression result |
-| Download Image | Save to device |
-| Share Image | Share via apps |
-| View Compression History | Past compressions |
-| Switch Theme | Light/dark mode |
-| View Profile | Account settings |
-| Sign Out | End session |
-| View About | App information |
+### Clerk Actor (Primary - Right Side)
+| ID | Use Case | Relationships |
+|----|----------|---------------|
+| UC-17 | Monitor System Performance | - |
+| UC-18 | Manage AI Models | - |
 
-### Firebase Auth Use Cases (Secondary)
-
-| Use Case | Description |
-|----------|-------------|
-| Authenticate Credentials | Verify email/password |
-| Create User Account | New registration |
-| OAuth Authentication | Google sign-in |
-| Send Reset Email | Password recovery |
-| Validate Session | Check auth state |
-
-### Cloud Firestore Use Cases (Secondary)
-
-| Use Case | Description |
-|----------|-------------|
-| Store Transaction | Save compression record |
-| Retrieve Transactions | Get user history |
-| Calculate Statistics | Aggregate metrics |
-| Delete Record | Remove transaction |
-| Store Preferences | Save user settings |
+### Secondary Actors (Right Side)
+| Actor | Connected Use Cases |
+|-------|---------------------|
+| Firebase Auth | UC-01, UC-02, UC-03, UC-04 |
+| Cloud Firestore | UC-14, UC-15, UC-16 |
 
 ---
 
-## Summary of Additions
-
-| What to Add | Count |
-|-------------|-------|
-| New Actors | 2 (Firebase Auth, Cloud Firestore) |
-| New Use Cases | 0 (use cases implicit in connections) |
-| New Relationships | 10 lines |
-| Modifications to Existing | 0 |
-
----
-
-## Academic Standard Reference
-
-According to **UML 2.5 Specification** (OMG):
-- Secondary actors (like databases, external systems) are placed on the **right side** of the system boundary
-- They represent external entities that the system uses to perform its functions
-- Connection lines show **participation** in use cases
-- Database actors can be represented as:
-  - Stick figures with stereotypes «database»
-  - Cylinder icons (traditional database symbol)
-  - Rectangles with system names
-
----
-
-## Mermaid Diagram Representation
+## Mermaid Diagram (Updated)
 
 ```mermaid
-graph LR
-    subgraph Actors_Primary["Primary Actors"]
+flowchart LR
+    subgraph Primary_Actors[" "]
+        direction TB
         User((User))
     end
     
-    subgraph System["DeepFract System"]
-        UC1[User Login]
-        UC2[User Registration]
-        UC3[Google Sign-In]
-        UC4[Upload Image]
-        UC5[Compress Image]
-        UC6[View Compressed Image]
-        UC7[Download/Share Image]
-        UC8[Save Transaction]
-        UC9[View History]
-        UC10[Switch Theme]
-        UC11[Store Preferences]
+    subgraph DeepFract_System["DeepFract System"]
+        direction TB
+        
+        subgraph Auth["Authentication"]
+            UC1[Login]
+            UC2[Sign up]
+            UC3[Google Sign-In]
+            UC4[Password Reset]
+        end
+        
+        subgraph Main_Flow["Image Compression"]
+            UC5[Switch Theme]
+            UC6[View Home Screen]
+            UC7[Take A Photo]
+            UC8[Select Image]
+            UC9[Press Compress Button]
+            UC10[View Compressed Image]
+            UC11[View Compression Statistics]
+            UC12[Share Compressed Image]
+            UC13[Download Compressed Image]
+        end
+        
+        subgraph Data["Data Management"]
+            UC14[View Compression History]
+            UC15[Save Compression Transaction]
+            UC16[Store User Preferences]
+        end
+        
+        subgraph Admin["Administration"]
+            UC17[Monitor System Performance]
+            UC18[Manage AI Models]
+        end
     end
     
-    subgraph Actors_Secondary["Secondary Actors"]
-        FirebaseAuth[(Firebase Auth)]
+    subgraph Secondary_Actors[" "]
+        direction TB
+        Firebase[(Firebase Auth)]
         Firestore[(Cloud Firestore)]
+        Clerk((Clerk))
     end
     
+    %% User connections
     User --> UC1
     User --> UC2
     User --> UC3
     User --> UC4
     User --> UC5
     User --> UC6
-    User --> UC7
     User --> UC9
-    User --> UC10
+    User --> UC14
     
-    UC1 --> FirebaseAuth
-    UC2 --> FirebaseAuth
-    UC3 --> FirebaseAuth
+    %% Extend/Include relationships
+    UC6 -.->|extend| UC7
+    UC6 -.->|extend| UC8
+    UC9 -.->|include| UC10
+    UC9 -.->|include| UC15
+    UC10 -.->|include| UC11
+    UC10 -.->|extend| UC12
+    UC10 -.->|extend| UC13
+    UC5 -.->|extend| UC16
     
-    UC5 --> UC8
-    UC8 --> Firestore
-    UC9 --> Firestore
-    UC11 --> Firestore
-    UC10 --> UC11
+    %% Firebase Auth connections
+    UC1 --> Firebase
+    UC2 --> Firebase
+    UC3 --> Firebase
+    UC4 --> Firebase
+    
+    %% Firestore connections
+    UC14 --> Firestore
+    UC15 --> Firestore
+    UC16 --> Firestore
+    
+    %% Clerk connections
+    Clerk --> UC17
+    Clerk --> UC18
 ```
 
 ---
 
-*No changes to existing structure, format, or entities - only database actors added*
+## Summary of Changes
+
+| Change Type | Count | Details |
+|-------------|-------|---------|
+| New Actors | 2 | Firebase Auth, Cloud Firestore |
+| New Use Cases | 5 | Google Sign-In, Password Reset, View Compression History, Save Compression Transaction, Store User Preferences |
+| New Relationships | 7 | 4 to Firebase Auth, 3 to Cloud Firestore |
+| Existing Changes | 0 | No modifications to existing elements |
+
+---
+
+## Academic Standard Reference
+
+According to **UML 2.5 Specification** (OMG):
+
+- **Primary Actors** (Users, Clerks): Placed on the **left side**
+- **Secondary Actors** (Systems, Databases): Placed on the **right side**
+- **Association Lines**: Simple solid lines connecting actors to use cases
+- **Include Relationship**: Dashed arrow with `<<include>>` stereotype
+- **Extend Relationship**: Dashed arrow with `<<extend>>` stereotype
+
+---
+
+*Document updated to reflect complete system requirements including database entities*

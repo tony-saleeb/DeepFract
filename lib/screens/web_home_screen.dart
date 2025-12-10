@@ -23,7 +23,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
 
   // Tutorial Keys
   final GlobalKey _logoKey = GlobalKey();
-  final GlobalKey _themeKey = GlobalKey();
+  final GlobalKey _profileKey = GlobalKey();
   final GlobalKey _uploadKey = GlobalKey();
 
   @override
@@ -57,10 +57,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
         position: ContentPosition.left,
       ),
       TutorialStep(
-        key: _themeKey,
-        title: 'Customize Your View',
+        key: _profileKey,
+        title: 'Your Profile',
         description:
-            'Toggle between Light and Dark mode to suit your preference.',
+            'Access your profile, view compression stats, and customize your theme.',
         position: ContentPosition.bottomRight,
       ),
     ]);
@@ -151,7 +151,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           const AnimatedBackground(),
           Column(
             children: [
-              WebNavbar(logoKey: _logoKey, themeToggleKey: _themeKey),
+              WebNavbar(logoKey: _logoKey, profileKey: _profileKey),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
